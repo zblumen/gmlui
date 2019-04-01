@@ -1,7 +1,7 @@
 #data files
-*.json
 *.pkl
 *.h5
 
 #project files
 .spyproject/
+node_modules/

@@ -69,7 +69,7 @@ args = SimpleNamespace(
         layer_size = [20,20],#The number of hidden features at each GraphSAGE layer
         location = "../data/cora", #Location of the CORA dataset (directory)"
         target = "subject", #The target node attribute (categorical)
-        cy_json_outfile = 'pred_graph' #begining of cytoscape graph output, 
+        cy_json_outfile = '../data/pred_graph' #begining of cytoscape graph output, 
         )
 
 def train(

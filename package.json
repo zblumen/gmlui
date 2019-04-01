@@ -1,0 +1,22 @@
+{
+  "name": "gmlui",
+  "version": "1.0.0",
+  "description": "Cytoscape React Component to Visualize GCN Output",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zblumen/gmlui.git"
+  },
+  "author": "Zach Blumenfeld",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/zblumen/gmlui/issues"
+  },
+  "homepage": "https://github.com/zblumen/gmlui#readme",
+  "dependencies": {
+    "react-cytoscapejs": "^1.1.0"
+  }
+}
