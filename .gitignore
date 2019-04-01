@@ -1,0 +1,7 @@
+#data files
+*.json
+*.pkl
+*.h5
+
+#project files
+.spyproject/
