@@ -58,6 +58,7 @@ from stellargraph.mapper import GraphSAGENodeGenerator
 from types import SimpleNamespace
 import hashlib
 import json 
+import random
 
 args = SimpleNamespace(
         checkpoint = None, #Load a saved checkpoint .h5 file
@@ -296,46 +297,89 @@ node_data = node_data.join(centrality_metrics, how = 'inner')
 ######## Make Cytoscape elements
 
 node_schema = {
-   'id' : 0,
-   'label' : 'INIT',
-   'actual_subject' : 'INIT',
-   'pred_subject' : 'INIT',
-   'w_indicators' : [],
-   'pc_degree' : -1.0, #pre calculated degree centrality
-   'pc_in_degree' : -1.0, #pre calculated in degree centrality
-   'pc_out_degree' : -1.0 #pre calculated out degree centrality
+   'data':{          
+        'id' : 0,
+        'label' : 'INIT',
+        'actual_subject' : 'INIT',
+        'pred_subject' : 'INIT',
+        'w_indicators' : [],
+        'pc_degree' : -1.0, #pre calculated degree centrality
+        'pc_in_degree' : -1.0, #pre calculated in degree centrality
+        'pc_out_degree' : -1.0 #pre calculated out degree centrality   
+   }
+
 }
 edge_schema = {
-  'id' : 0,
-  'source' : 'INIT',
-  'target' : 'INIT'      
+   'data':{          
+      'id' : 0,
+      'source' : 'INIT',
+      'target' : 'INIT'    
+   }  
 }
 
 nodes = []
 edges = []
 
 for index, row in node_data.iterrows():
-    node = node_schema.copy()
-    node['id'] = str(index)
-    node['label'] = str(index)
-    node['w_indicators'] = row[row == 1].index.tolist()
-    node['actual_subject'] = row.subject
-    node['pred_subject'] = row.pred_subject
-    node['pc_degree'] = row.degree
-    node['pc_in_degree'] = row.in_degree
-    node['pc_out_degree'] = row.out_degree
-    nodes.append(node)
+    node = {'data':{}}
+    node['data']['id'] = str(index)
+    node['data']['label'] = str(index)
+    node['data']['w_indicators'] = row[row == 1].index.tolist()
+    node['data']['actual_subject'] = row.subject
+    node['data']['pred_subject'] = row.pred_subject
+    node['data']['pc_degree'] = row.degree
+    node['data']['pc_in_degree'] = row.in_degree
+    node['data']['pc_out_degree'] = row.out_degree
+    nodes.append(node.copy())
     
 for index, row in edgelist.iterrows():
-    edge = edge_schema.copy()
+    edge = {'data':{}}
     s = str(row.source)
     t = str(row.target)
-    edge['id'] = s + '-to-' + t
-    edge['source'] = s
-    edge['target'] = t
-    edges.append(edge)
+    edge['data']['id'] = s + '-to-' + t
+    edge['data']['source'] = s
+    edge['data']['target'] = t
+    edges.append(edge.copy())
+ 
+
+##This is big.  Sample 500 edges only
+edges_sample = random.sample(population=edges, k=300)
+  
+sample_nodes_ids = []
+nodes_sample = []
+for item in edges_sample:
+     n_s = item['data']['source']
+     if n_s not in sample_nodes_ids:
+        sample_nodes_ids.append(n_s)
+        node = {'data':{}}
+        row = node_data.loc[int(n_s),:]
+        node['data']['id'] = n_s
+        node['data']['label'] = n_s
+        node['data']['w_indicators'] = row[row == 1].index.tolist()
+        node['data']['actual_subject'] = row.subject
+        node['data']['pred_subject'] = row.pred_subject
+        node['data']['pc_degree'] = row.degree
+        node['data']['pc_in_degree'] = row.in_degree
+        node['data']['pc_out_degree'] = row.out_degree
+        nodes_sample.append(node.copy())
         
-graphP = {'elements':{'nodes':nodes,'edges':edges}}
+     n_t = item['data']['target']
+     if n_t not in sample_nodes_ids:
+        sample_nodes_ids.append(n_t)
+        node = {'data':{}}
+        row = node_data.loc[int(n_t),:]
+        node['data']['id'] = n_t
+        node['data']['label'] = n_t
+        node['data']['w_indicators'] = row[row == 1].index.tolist()
+        node['data']['actual_subject'] = row.subject
+        node['data']['pred_subject'] = row.pred_subject
+        node['data']['pc_degree'] = row.degree
+        node['data']['pc_in_degree'] = row.in_degree
+        node['data']['pc_out_degree'] = row.out_degree    
+        nodes_sample.append(node.copy())
+        
+        
+graphP = {'elements':{'nodes':nodes_sample,'edges':edges_sample}}
 temp_string = json.dumps(graphP)
 filename = args.cy_json_outfile + '_' + hashlib.md5(temp_string.encode('utf-8')).hexdigest() +'.json'
 with open(filename , 'w') as wf:
